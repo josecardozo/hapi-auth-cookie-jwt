@@ -1,27 +1,38 @@
 {
   "name": "hapi-auth-cookie-jwt",
-  "version": "0.5.0",
+  "version": "0.9.0",
   "description": "JWT Cookie authentication plugin",
   "main": "lib/index.js",
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:josecardozo/hapi-auth-cookie-jwt.git"
+  "directories": {
+    "example": "example",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "peerDependencies": {
     "hapi": ">=8.x.x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josecardozo/hapi-auth-cookie-jwt.git"
   },
   "keywords": [
     "hapi",
     "plugin",
     "cookie",
-    "jwt",
-    "auth"
+    "auth",
+    "jwt"
   ],
-  "author": "Jose Ricardo Anacleto Cardozo <jose.cardozo@digitro.com.br> (http://gitlab.digitro.com.br/u/jose.cardozo)",
+  "author": "Jose Cardozo",
   "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/josecardozo/hapi-auth-cookie-jwt/issues"
+  },
+  "homepage": "https://github.com/josecardozo/hapi-auth-cookie-jwt#readme",
   "dependencies": {
     "boom": "^2.8.0",
     "hoek": "^2.14.0",
-    "joi": "^6.4.3"
+    "joi": "^6.5.0"
   }
 }
