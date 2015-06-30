@@ -1,0 +1,27 @@
+{
+  "name": "hapi-auth-cookie-jwt",
+  "version": "0.5.0",
+  "description": "JWT Cookie authentication plugin",
+  "main": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:josecardozo/hapi-auth-cookie-jwt.git"
+  },
+  "peerDependencies": {
+    "hapi": ">=8.x.x"
+  },
+  "keywords": [
+    "hapi",
+    "plugin",
+    "cookie",
+    "jwt",
+    "auth"
+  ],
+  "author": "Jose Ricardo Anacleto Cardozo <jose.cardozo@digitro.com.br> (http://gitlab.digitro.com.br/u/jose.cardozo)",
+  "license": "BSD-3-Clause",
+  "dependencies": {
+    "boom": "^2.8.0",
+    "hoek": "^2.14.0",
+    "joi": "^6.4.3"
+  }
+}

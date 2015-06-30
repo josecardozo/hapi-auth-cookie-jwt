@@ -1,0 +1,51 @@
+# Binary code      #
+####################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Packages #
+###########
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Logs and data base   #
+########################
+*.log
+*.log.*
+*.sql
+*.sqlite
+
+# OS Files                                  #
+#############################################
+.DS_Store*
+ehthumbs.db
+Icon?
+Thumbs.db
+
+# Temp files           #
+########################
+*~
+*.swp
+*.pem
+
+# Node.js Modules #
+###################
+node_modules
+npm-debug.log
+coverage
+
+# Other files #
+######################################
+*.sublime-project
+*.sublime-workspace
+*.sublime-grunt.cache
