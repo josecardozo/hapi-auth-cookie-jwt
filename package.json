@@ -34,5 +34,11 @@
     "boom": "^2.8.0",
     "hoek": "^2.14.0",
     "joi": "^6.5.0"
+  },
+  "devDependencies": {
+    "chai": "^3.0.0",
+    "hapi": "^8.6.1",
+    "jsonwebtoken": "^5.0.2",
+    "lab": "^5.12.0"
   }
 }
