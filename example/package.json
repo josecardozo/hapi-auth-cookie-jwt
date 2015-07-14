@@ -1,0 +1,16 @@
+{
+    "name": "jwtCookieExample",
+    "version": "0.0.1",
+    "description": "Example of hapi-auth-cookie-jwt",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "hapi": "8.x.x",
+        "hapi-auth-cookie-jwt": "1.x.x",
+        "jsonwebtoken": "1.3.x"
+    }
+}
