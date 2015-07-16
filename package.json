@@ -8,7 +8,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "lab -T 88"
+    "test": "lab -t 88"
   },
   "peerDependencies": {
     "hapi": ">=8.x.x"
