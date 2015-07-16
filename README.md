@@ -1,5 +1,7 @@
 # hapi-auth-cookie-jwt #
 
+[![Build Status](https://secure.travis-ci.org/josecardozo/hapi-auth-cookie-jwt.png)](http://travis-ci.org/josecardozo/hapi-auth-cookie-jwt)
+
 This is a [Hapi](http://hapijs.com) JSON Web Token (JWT), authentication plugin. It's based on the project [hapi-auth-jwt](https://github.com/ryanfitz/hapi-auth-jwt), but with the difference that in this plugin, the token is passed through the **cookie** header field.
 
 JSON Web Token authentication requires verifying a signed token. The `'jwt-cookie'` scheme takes the following options:
