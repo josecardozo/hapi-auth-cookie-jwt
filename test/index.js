@@ -160,7 +160,7 @@ describe('Token', function () {
 
     it('Returns an error with expired token', function (done) {
 
-        var request = { method: 'POST', url: '/token', headers: { cookie: tokenHeader('johndoe', { expiresInMinutes: -10 }) } };
+        var request = { method: 'POST', url: '/token', headers: { cookie: tokenHeader('johndoe', { expiresIn: -10 }) } };
 
         server.inject(request, function (res) {
             expect(res.result.message).to.equal('Expired token received for JSON Web Token validation');
