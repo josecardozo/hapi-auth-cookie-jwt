@@ -1,6 +1,6 @@
 {
   "name": "hapi-auth-cookie-jwt",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "JWT Cookie authentication plugin",
   "main": "lib/index.js",
   "directories": {
@@ -37,8 +37,8 @@
   },
   "devDependencies": {
     "chai": "^3.0.0",
-    "hapi": "^8.6.1",
+    "hapi": "^10.x.x",
     "jsonwebtoken": "^5.4.x",
-    "lab": "^5.12.0"
+    "lab": "^6.x.x"
   }
 }
