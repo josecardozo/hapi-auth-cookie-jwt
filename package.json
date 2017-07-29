@@ -8,7 +8,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "lab -t 88"
+    "test": "lab -t 88 -l"
   },
   "peerDependencies": {
     "hapi": ">=8.x.x"
@@ -31,14 +31,14 @@
   },
   "homepage": "https://github.com/josecardozo/hapi-auth-cookie-jwt#readme",
   "dependencies": {
-    "boom": "^2.8.0",
+    "boom": "^2.10.1",
     "hoek": "^2.14.0",
-    "joi": "^6.5.0"
+    "joi": "^6.10.1"
   },
   "devDependencies": {
-    "chai": "^3.0.0",
+    "chai": "^3.5.0",
     "hapi": "^10.x.x",
-    "jsonwebtoken": "^5.4.x",
+    "jsonwebtoken": "^5.7.0",
     "lab": "^6.x.x"
   }
 }
