@@ -112,15 +112,15 @@ describe('Token', function () {
             server.route([
                 { method: 'POST', path: '/token', handler: handler, config: { auth: 'default' } }
             ]);
-        });
 
-        var request = { method: 'POST', url: '/token', headers: { cookie: tokenHeader('johndoe') } };
+            var request = { method: 'POST', url: '/token', headers: { cookie: tokenHeader('johndoe') } };
 
-        server.inject(request, function (res) {
+            server.inject(request, function (res) {
 
-            expect(res.result).to.exist;
-            expect(res.result).to.equal('ok');
-            done();
+                expect(res.result).to.exist;
+                expect(res.result).to.equal('ok');
+                done();
+            });
         });
     });
 
