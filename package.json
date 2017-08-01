@@ -7,6 +7,9 @@
     "example": "example",
     "test": "test"
   },
+  "engines": {
+    "node": ">=4.0.0"
+  },
   "scripts": {
     "test": "lab -t 88 -l"
   },
