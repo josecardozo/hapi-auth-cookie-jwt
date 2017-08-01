@@ -43,9 +43,11 @@ Thumbs.db
 node_modules
 npm-debug.log
 coverage
+package-lock.json
 
 # Other files #
 ######################################
 *.sublime-project
 *.sublime-workspace
 *.sublime-grunt.cache
+*.vscode
