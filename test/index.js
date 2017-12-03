@@ -1,29 +1,27 @@
-var Jwt  = require('jsonwebtoken');
-var Boom = require('boom');
-var Hapi = require('hapi');
-var Lab  = require('lab');
+const Jwt  = require('jsonwebtoken');
+const Boom = require('boom');
+const Hapi = require('hapi');
+const Lab  = require('lab');
 
-var lab = exports.lab = Lab.script();
-var expect = require('chai').expect;
-var describe = lab.describe;
-var before = lab.before;
-var it = lab.it;
+const lab = exports.lab = Lab.script();
+const expect = require('chai').expect;
+const describe = lab.describe;
+const before = lab.before;
+const it = lab.it;
 
-var util = require('util');
+const util = require('util');
 
 describe('Token', function () {
 
-    var privateKey = '8F6DA9E8-4A86-4B3E-ABBB-199E17EE5B70';
+    const privateKey = '8F6DA9E8-4A86-4B3E-ABBB-199E17EE5B70';
 
-    var tokenHeader = function (username, options) {
-
+    const tokenHeader = (username, options) => {
         options = options || {};
-        return 'access_token=' + Jwt.sign({username : username}, privateKey, options);
+        return 'access_token=' + Jwt.sign({username}, privateKey, options);
     };
 
-    var loadUser = function (decodedToken, callback) {
-        
-        var username = decodedToken.username;
+    const loadUser = (decodedToken, callback) => {
+        const username = decodedToken.username;
 
         if (username === 'johndoe') {
             return callback(null, true, {
@@ -31,288 +29,381 @@ describe('Token', function () {
                 scope: ['a']
             });
         } else if (username === 'jane') {
-
             return callback(Boom.badImplementation());
-
         } else if (username === 'invalid1') {
-
            return callback(null, true, 'bad');
-    
         } else if (username === 'nullman') {
-
            return callback(null, true, null);
         }
         return callback(null, false);
     };
 
-    var tokenHandler = function (request, reply) {
-
-        reply('ok');
+    const tokenHandler = (request, h) => {
+        return 'ok';
     };
 
-    var doubleHandler = function (request, reply) {
-
-        var options = { method: 'POST', url: '/token', headers: { cookie: tokenHeader('johndoe') }, credentials: request.auth.credentials };
-        server.inject(options, function (res) {
-
-            reply(res.result);
-        });
+    const doubleHandler = async (request, h) => {
+        const options = {
+            method: 'POST',
+            url: '/token',
+            headers: {
+                cookie: tokenHeader('johndoe')
+            },
+            credentials: request.auth.credentials
+        };
+        const response = await server.inject(options);
+        const payload = response.payload;
+        return payload;
     };
 
-    var server = new Hapi.Server({ debug: false });
-    server.connection();
+    const server = new Hapi.Server({ debug: false });
 
-    before(function (done) {
+    before(async () => {
 
-        server.register(require('../'), function (err) {
-
-            expect(err).to.not.exist;
-            server.auth.strategy('default', 'jwt-cookie', 'required', { key: privateKey,  validateFunc: loadUser });
-
-            server.route([
-                { method: 'POST', path: '/token', handler: tokenHandler, config: { auth: 'default' } },
-                { method: 'POST', path: '/tokenOptional', handler: tokenHandler, config: { auth: { mode: 'optional' } } },
-                { method: 'POST', path: '/tokenScope', handler: tokenHandler, config: { auth: { scope: 'x' } } },
-                { method: 'POST', path: '/tokenArrayScope', handler: tokenHandler, config: { auth: { scope: ['x', 'y'] } } },
-                { method: 'POST', path: '/tokenArrayScopeA', handler: tokenHandler, config: { auth: { scope: ['x', 'y', 'a'] } } },
-                { method: 'POST', path: '/double', handler: doubleHandler }
-            ]);
-            done();
+        const error = await server.register({plugin: require('../')});
+        expect(error).to.not.exist;
+        server.auth.strategy('default', 'jwt-cookie', { key: privateKey,  validateFunc: loadUser });
+        server.auth.default({
+            mode: 'required',
+            strategy: 'default'
         });
+
+        server.route([
+            {
+                method: 'POST',
+                path: '/token',
+                handler: tokenHandler,
+                options: {
+                    auth: 'default'
+                }
+            },
+            {
+                method: 'POST',
+                path: '/tokenOptional',
+                handler: tokenHandler,
+                options: {
+                    auth: {
+                        mode: 'optional'
+                    }
+                }
+            },
+            {
+                method: 'POST',
+                path: '/tokenScope',
+                handler: tokenHandler,
+                options: {
+                    auth: {
+                        scope: 'x'
+                    }
+                }
+            },
+            {
+                method: 'POST',
+                path: '/tokenArrayScope',
+                handler: tokenHandler,
+                options: {
+                    auth: {
+                        scope: ['x', 'y']
+                    }
+                }
+            },
+            {
+                method: 'POST',
+                path: '/tokenArrayScopeA',
+                handler: tokenHandler,
+                options: {
+                    auth: {
+                        scope: ['x', 'y', 'a']
+                    }
+                }
+            },
+            {
+                method: 'POST',
+                path: '/double',
+                handler: doubleHandler
+            }
+        ]);
     });
 
-    it('Returns a reply on successful auth', function (done) {
-
-        var request = { method: 'POST', url: '/token', headers: { cookie: tokenHeader('johndoe') } };
-
-        server.inject(request, function (res) {
-
-            expect(res.result).to.exist;
-            expect(res.result).to.equal('ok');
-            done();
-        });
-    });
-
-    it('Returns decoded token when no validation function is set', function (done) {
-
-        var handler = function (request, reply) {
-            expect(request.auth.isAuthenticated).to.equal(true);
-            expect(request.auth.credentials).to.exist;
-            reply('ok');
+    it('Returns a reply on successful auth', async () => {
+        const request = {
+            method: 'POST',
+            url: '/token',
+            headers: {
+                cookie: tokenHeader('johndoe')
+            }
         };
 
-        var server = new Hapi.Server({ debug: false });
-
-        server.connection();
-        server.register(require('../'), function (err) {
-            
-            expect(err).to.not.exist;
-            server.auth.strategy('default', 'jwt-cookie', 'required', { key: privateKey });
-
-            server.route([
-                { method: 'POST', path: '/token', handler: handler, config: { auth: 'default' } }
-            ]);
-
-            var request = { method: 'POST', url: '/token', headers: { cookie: tokenHeader('johndoe') } };
-
-            server.inject(request, function (res) {
-
-                expect(res.result).to.exist;
-                expect(res.result).to.equal('ok');
-                done();
-            });
-        });
+        const res = await server.inject(request);
+        expect(res.result).to.exist;
+        expect(res.result).to.equal('ok');
     });
 
-    it('Returns an error on wrong scheme', function (done) {
+    it('Returns decoded token when no validation function is set', async () => {
 
-        var request = { method: 'POST', url: '/token', headers: { cookie: 'JUST_A_EXAMPLE=BLAH' } };
+        const handler = (request, h) => {
+            expect(request.auth.isAuthenticated).to.equal(true);
+            expect(request.auth.credentials).to.exist;
+            return 'ok';
+        };
 
-        server.inject(request, function (res) {
+        const server = new Hapi.Server({ debug: false });
 
-            expect(res.statusCode).to.equal(401);
-            done();
+        const error = await server.register({plugin: require('../')});
+        expect(error).to.not.exist;
+        server.auth.strategy('default', 'jwt-cookie', { key: privateKey });
+        server.auth.default({
+            mode: 'required',
+            strategy: 'default'
         });
+        server.route([
+            {
+                method: 'POST',
+                path: '/token',
+                handler: handler,
+                config: {
+                    auth: 'default'
+                }
+            }
+        ]);
+
+        const request = {
+            method: 'POST',
+            url: '/token',
+            headers: {
+                cookie: tokenHeader('johndoe')
+            }
+        };
+
+        const res = await server.inject(request);
+        expect(res.result).to.exist;
+        expect(res.result).to.equal('ok');
     });
 
-    it('Returns a reply on successful double auth', function (done) {
+    it('Returns an error on wrong scheme', async () => {
+        const request = {
+            method: 'POST',
+            url: '/token',
+            headers: {
+                cookie: 'JUST_A_EXAMPLE=BLAH'
+            }
+        };
 
-        var request = { method: 'POST', url: '/double', headers: { cookie: tokenHeader('johndoe') } };
-
-        server.inject(request, function (res) {
-
-            expect(res.result).to.exist;
-            expect(res.result).to.equal('ok');
-            done();
-        });
+        const res = await server.inject(request);
+        expect(res.statusCode).to.equal(401);
     });
 
-    it('Returns a reply on failed optional auth', function (done) {
+    it('Returns a reply on successful double auth', async () => {
 
-        var request = { method: 'POST', url: '/tokenOptional' };
+        const request = {
+            method: 'POST',
+            url: '/double',
+            headers: {
+                cookie: tokenHeader('johndoe')
+            }
+        };
 
-        server.inject(request, function (res) {
-
-            expect(res.result).to.equal('ok');
-            done();
-        });
+        const res = await server.inject(request);
+        expect(res.result).to.exist;
+        expect(res.result).to.equal('ok');
     });
 
-    it('Returns an error with expired token', function (done) {
+    it('Returns a reply on failed optional auth', async () => {
 
-        var request = { method: 'POST', url: '/token', headers: { cookie: tokenHeader('johndoe', { expiresIn: -10 }) } };
+        const request = {
+            method: 'POST',
+            url: '/tokenOptional'
+        };
 
-        server.inject(request, function (res) {
-            expect(res.result.message).to.equal('Expired token received for JSON Web Token validation');
-            expect(res.statusCode).to.equal(401);
-            done();
-        });
+        const res = await server.inject(request);
+        expect(res.result).to.equal('ok');
     });
 
-    it('Returns an error with invalid token', function (done) {
+    it('Returns an error with expired token', async () => {
+
+        const request = {
+            method: 'POST',
+            url: '/token',
+            headers: {
+                cookie: tokenHeader('johndoe', { expiresIn: -10 })
+            }
+        };
+
+        const res = await server.inject(request);
+        expect(res.result.message).to.equal('Expired token received for JSON Web Token validation');
+        expect(res.statusCode).to.equal(401);
+    });
+
+    it('Returns an error with invalid token', async () => {
         
-        var token = tokenHeader('johndoe') + '15643287619';
-        var request = { method: 'POST', url: '/token', headers: { cookie: token } };
+        const token = tokenHeader('johndoe') + '15643287619';
+        const request = {
+            method: 'POST',
+            url: '/token',
+            headers: {
+                cookie: token
+            }
+        };
 
-        server.inject(request, function (res) {
-            expect(res.result.message).to.equal('Invalid signature received for JSON Web Token validation');
-            expect(res.statusCode).to.equal(401);
-            done();
-        });
+        const res = await server.inject(request);
+        expect(res.result.message).to.equal('Invalid signature received for JSON Web Token validation');
+        expect(res.statusCode).to.equal(401);
     });
 
-    it('Returns an error on bad header format', function (done) {
+    it('Returns an error on bad header format', async () => {
 
-        var request = { method: 'POST', url: '/token', headers: { cookie: 'Bearer' } };
+        const request = {
+            method: 'POST',
+            url: '/token',
+            headers: {
+                cookie: 'Bearer'
+            }
+        };
 
-        server.inject(request, function (res) {
-
-            expect(res.result).to.exist;
-            expect(res.statusCode).to.equal(400);
-            expect(res.result.isMissing).to.equal(undefined);
-            done();
-        });
+        const res = await server.inject(request);
+        expect(res.result).to.exist;
+        expect(res.statusCode).to.equal(400);
+        expect(res.result.isMissing).to.equal(undefined);
     });
 
-    it('Returns an error on bad header format', function (done) {
+    it('Returns an error on bad header format', async () => {
 
-        var request = { method: 'POST', url: '/token', headers: { cookie: 'bearer' } };
+        const request = {
+            method: 'POST',
+            url: '/token',
+            headers: {
+                cookie: 'bearer'
+            }
+        };
 
-        server.inject(request, function (res) {
-
-            expect(res.result).to.exist;
-            expect(res.statusCode).to.equal(400);
-            expect(res.result.isMissing).to.equal(undefined);
-            done();
-        });
+        const res = await server.inject(request);
+        expect(res.result).to.exist;
+        expect(res.statusCode).to.equal(400);
+        expect(res.result.isMissing).to.equal(undefined);
     });
 
-    it('Returns an error on bad header internal syntax', function (done) {
+    it('Returns an error on bad header internal syntax', async () => {
 
-        var request = { method: 'POST', url: '/token', headers: { cookie: 'bearer 123' } };
+        const request = {
+            method: 'POST',
+            url: '/token',
+            headers: {
+                cookie: 'bearer 123'
+            }
+        };
 
-        server.inject(request, function (res) {
-
-            expect(res.result).to.exist;
-            expect(res.statusCode).to.equal(400);
-            expect(res.result.isMissing).to.equal(undefined);
-            done();
-        });
+        const res = await server.inject(request);
+        expect(res.result).to.exist;
+        expect(res.statusCode).to.equal(400);
+        expect(res.result.isMissing).to.equal(undefined);
     });
 
-    it('Returns an error on unknown user', function (done) {
+    it('Returns an error on unknown user', async () => {
 
-        var request = { method: 'POST', url: '/token', headers: { cookie: tokenHeader('doe') } };
+        const request = {
+            method: 'POST',
+            url: '/token',
+            headers: {
+                cookie: tokenHeader('doe')
+            }
+        };
 
-        server.inject(request, function (res) {
-
-            expect(res.result).to.exist;
-            expect(res.statusCode).to.equal(401);
-            done();
-        });
+        const res = await server.inject(request);
+        expect(res.result).to.exist;
+        expect(res.statusCode).to.equal(401);
     });
 
-    it('Returns an error on internal user lookup error', function (done) {
+    it('Returns an error on internal user lookup error', async () => {
 
-        var request = { method: 'POST', url: '/token', headers: { cookie: tokenHeader('jane') } };
+        const request = {
+            method: 'POST',
+            url: '/token',
+            headers: {
+                cookie: tokenHeader('jane')
+            }
+        };
 
-        server.inject(request, function (res) {
-
-            expect(res.result).to.exist;
-            expect(res.statusCode).to.equal(500);
-            done();
-        });
+        const res = await server.inject(request);
+        expect(res.result).to.exist;
+        expect(res.statusCode).to.equal(500);
     });
 
-    it('Returns an error on non-object credentials error', function (done) {
+    it('Returns an error on non-object credentials error', async () => {
 
-        var request = { method: 'POST', url: '/token', headers: { cookie: tokenHeader('invalid1') } };
+        const request = { method: 'POST', url: '/token', headers: { cookie: tokenHeader('invalid1') } };
 
-        server.inject(request, function (res) {
-
-            expect(res.result).to.exist;
-            expect(res.statusCode).to.equal(500);
-            done();
-        });
+        const res = await server.inject(request);
+        expect(res.result).to.exist;
+        expect(res.statusCode).to.equal(500);
     });
 
     // ??
-    it('Returns an error on null credentials error', function (done) {
+    it('Returns an error on null credentials error', async () => {
 
-        var request = { method: 'POST', url: '/token', headers: { cookie: tokenHeader('nullman') } };
+        const request = {
+            method: 'POST',
+            url: '/token',
+            headers: {
+                cookie: tokenHeader('nullman')
+            }
+        };
 
-        server.inject(request, function (res) {
-
-            expect(res.result).to.exist;
-            expect(res.statusCode).to.equal(500);
-            done();
-        });
+        const res = await server.inject(request);
+        expect(res.result).to.exist;
+        expect(res.statusCode).to.equal(500);
     });
 
-    it('Returns an error on insufficient scope', function (done) {
+    it('Returns an error on insufficient scope', async () => {
 
-        var request = { method: 'POST', url: '/tokenScope', headers: { cookie: tokenHeader('johndoe') } };
+        const request = {
+            method: 'POST',
+            url: '/tokenScope',
+            headers: {
+                cookie: tokenHeader('johndoe')
+            }
+        };
 
-        server.inject(request, function (res) {
-
-            expect(res.result).to.exist;
-            expect(res.statusCode).to.equal(403);
-            done();
-        });
+        const res = await server.inject(request);
+        expect(res.result).to.exist;
+        expect(res.statusCode).to.equal(403);
     });
 
-    it('Returns an error on insufficient scope specified as an array', function (done) {
+    it('Returns an error on insufficient scope specified as an array', async () => {
 
-        var request = { method: 'POST', url: '/tokenArrayScope', headers: { cookie: tokenHeader('johndoe') } };
+        const request = {
+            method: 'POST',
+            url: '/tokenArrayScope',
+            headers: {
+                cookie: tokenHeader('johndoe')
+            }
+        };
 
-            server.inject(request, function (res) {
-
-            expect(res.result).to.exist;
-            expect(res.statusCode).to.equal(403);
-            done();
-        });
+        const res = await server.inject(request);
+        expect(res.result).to.exist;
+        expect(res.statusCode).to.equal(403);
     });
 
-    it('Authenticates scope specified as an array', function (done) {
+    it('Authenticates scope specified as an array', async () => {
 
-        var request = { method: 'POST', url: '/tokenArrayScopeA', headers: { cookie: tokenHeader('johndoe') } };
+        const request = {
+            method: 'POST',
+            url: '/tokenArrayScopeA',
+            headers: {
+                cookie: tokenHeader('johndoe')
+            }
+        };
 
-        server.inject(request, function (res) {
-
-            expect(res.result).to.exist;
-            expect(res.statusCode).to.equal(200);
-            done();
-        });
+        const res = await server.inject(request);
+        expect(res.result).to.exist;
+        expect(res.statusCode).to.equal(200);
     });
 
-    it('Cannot add a route that has payload validation required', function (done) {
+    it('Cannot add a route that has payload validation required', async () => {
 
-        var fn = function () {
-
-            server.route({ method: 'POST', path: '/tokenPayload', handler: tokenHandler, config: { auth: { mode: 'required', payload: 'required' } } });
+        const fn = function () {
+            server.route({ method: 'POST', path: '/tokenPayload', handler: tokenHandler, options: { auth: { mode: 'required', payload: 'required' } } });
         };
 
         expect(fn).to.throw(Error);
-        done();
     });
 });
