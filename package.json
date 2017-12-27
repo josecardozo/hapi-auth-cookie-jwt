@@ -1,6 +1,6 @@
 {
   "name": "hapi-auth-cookie-jwt",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "JWT Cookie authentication plugin",
   "main": "lib/index.js",
   "directories": {
@@ -8,13 +8,13 @@
     "test": "test"
   },
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=8.0.0"
   },
   "scripts": {
     "test": "lab -t 88 -l"
   },
   "peerDependencies": {
-    "hapi": ">=8.x.x"
+    "hapi": ">=17.x.x"
   },
   "repository": {
     "type": "git",
@@ -34,14 +34,14 @@
   },
   "homepage": "https://github.com/josecardozo/hapi-auth-cookie-jwt#readme",
   "dependencies": {
-    "boom": "^5.2.0",
-    "hoek": "^4.2.0",
-    "joi": "^10.6.0"
+    "boom": "^7.1.0",
+    "hoek": "^5.0.0",
+    "joi": "^13.0.0"
   },
   "devDependencies": {
     "chai": "^4.1.0",
-    "hapi": "^16.x.x",
-    "jsonwebtoken": "^7.4.1",
-    "lab": "^14.x.x"
+    "hapi": "^17.x.x",
+    "jsonwebtoken": "^8.1.0",
+    "lab": "^15.x.x"
   }
 }
