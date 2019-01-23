@@ -49,7 +49,10 @@ describe('Token', function () {
             headers: {
                 cookie: tokenHeader('johndoe')
             },
-            credentials: request.auth.credentials
+            auth: {
+                strategy: 'default',
+                credentials: request.auth.credentials
+            }
         };
         const response = await server.inject(options);
         const payload = response.payload;
@@ -204,6 +207,7 @@ describe('Token', function () {
         };
 
         const res = await server.inject(request);
+        //console.log('Error: '+JSON.stringify(res.result, null, 2));
         expect(res.result).to.exist;
         expect(res.result).to.equal('ok');
     });
